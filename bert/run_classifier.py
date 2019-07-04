@@ -157,7 +157,6 @@ class PaddingInputExample(object):
   battches could cause silent errors.
   """
 
-
 class InputFeatures(object):
   """A single set of features of data."""
 
@@ -970,6 +969,64 @@ def main(_):
         writer.write(output_line)
         num_written_lines += 1
     assert num_written_lines == num_actual_predict_examples
+
+
+class IMDBProcessor(DataProcessor):
+    """
+    IMDB data processor
+    """
+    def _read_csv(self, data_dir, file_name):
+        with tf.gfile.Open(data_dir + file_name, "r") as f:
+            reader = csv.reader(f, delimiter=",", quotechar=None)
+            lines = []
+            for line in reader:
+                lines.append(line)
+
+        return lines
+
+    def get_train_examples(self, data_dir):
+        lines = self._read_csv(data_dir,'trainData.csv')
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "train-%d" % (i)
+            text_a = tokenization.convert_to_unicode(line[0])
+            label = tokenization.convert_to_unicode(line[1])
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, label=label))
+        return examples
+
+    def get_dev_examples(self, data_dir):
+        lines = self._read_csv(data_dir, "devData.csv")
+
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "dev-%d" % (i)
+            text_a = tokenization.convert_to_unicode(line[0])
+            label = tokenization.convert_to_unicode(line[1])
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, label=label))
+        return examples
+
+    def get_test_examples(self, data_dir):
+        lines = self._read_csv(data_dir, "testData.csv")
+
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "test-%d" % (i)
+            text_a = tokenization.convert_to_unicode(line[0])
+            label = tokenization.convert_to_unicode(line[1])
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, label=label))
+        return examples
+
+    def get_labels(self):
+        return ["0", "1"]
 
 
 if __name__ == "__main__":
